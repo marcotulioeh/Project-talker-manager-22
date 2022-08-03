@@ -27,6 +27,17 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.get('/talker/search', checkToken, rescue(async (req, res) => {
+  const search = req.query.q;
+  const talkerJson = await fs.readFile('talker.json');
+  const talker = await JSON.parse(talkerJson);
+  const talkerFilter = talker.filter((talk) => talk.name.includes(search));
+  if (!search || search === '') {
+    return res.status(200).json(talker);
+  }
+  return res.status(200).json(talkerFilter);
+}));
+
 app.get('/talker', rescue(async (_req, res) => {
   const talker = await getFsTalker();
   res.status(200).json(talker);
