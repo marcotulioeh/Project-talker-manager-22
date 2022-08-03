@@ -14,6 +14,7 @@ const {
   checkWatchedAt,
   checkRate,
 } = require('./tokenValidation');
+const { parse } = require('path');
 
 const app = express();
 app.use(bodyParser.json());
@@ -56,6 +57,24 @@ app.post('/talker', checkToken, checkName, checkAge, checkTalk, checkRate, check
   const newFileTalkers = [...talker, talkers];
   await setFsTalker(newFileTalkers);
   res.status(201).json(talkers);
+}));
+
+app.put('/talker/:id', checkToken, checkName, checkAge, checkTalk, checkRate, checkWatchedAt, rescue(async (req, res) => {
+  const { name, age, talk: { watchedAt, rate } } = req.body;
+  const { id } = req.params;
+  const talkerJson = await fs.readFile('talker.json');
+  const talkerParse = await JSON.parse(talkerJson);
+  const talkerIndex = talkerParse.findIndex((talker) => talker.id === parseInt(id, 10));
+  const newTalker = {
+    id: parseInt(id, 10),
+    name,
+    age,
+    talk: { watchedAt, rate },
+  };
+  const newTalkers = [...talkerParse];
+  newTalkers[talkerIndex] = newTalker;
+  await setFsTalker(newTalkers);
+  res.status(200).json(newTalker);
 }));
 
 app.listen(PORT, () => {
