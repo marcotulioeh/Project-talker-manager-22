@@ -2,6 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const rescue = require('express-rescue');
 const { getFsTalker } = require('./fsTalker');
+const crypto = require('crypto');
+const {
+  checkEmail,
+  checkPassword,
+} = require('./tokenValidation');
 
 const app = express();
 app.use(bodyParser.json());
@@ -25,6 +30,11 @@ app.get('/talker/:id',  rescue(async (req, res) => {
   const idTalker = talkers.find((talker) => talker.id === parseInt(id, 10));
   !idTalker ? res.status(404).json({ message: 'Pessoa palestrante não encontrada'}) : res.status(200).json(idTalker);
 }));
+
+app.post('/login', checkEmail, checkPassword, (_req, res) => {
+  const token = crypto.randomBytes(8).toString('hex');
+  res.status(200).json({ token: `${token}` });
+});
 
 app.listen(PORT, () => {
   console.log('Online');
