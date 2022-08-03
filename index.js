@@ -2,8 +2,8 @@ const express = require('express');
 const fs = require('fs').promises;
 const bodyParser = require('body-parser');
 const rescue = require('express-rescue');
-const { getFsTalker, setFsTalker } = require('./fsTalker');
 const crypto = require('crypto');
+const { getFsTalker, setFsTalker } = require('./fsTalker');
 const {
   checkEmail,
   checkPassword,
@@ -14,7 +14,6 @@ const {
   checkWatchedAt,
   checkRate,
 } = require('./tokenValidation');
-const { parse } = require('path');
 
 const app = express();
 app.use(bodyParser.json());
@@ -43,11 +42,14 @@ app.get('/talker', rescue(async (_req, res) => {
   res.status(200).json(talker);
 }));
 
-app.get('/talker/:id',  rescue(async (req, res) => {
+app.get('/talker/:id', rescue(async (req, res) => {
   const { id } = req.params;
   const talkers = await getFsTalker();
   const idTalker = talkers.find((talker) => talker.id === parseInt(id, 10));
-  !idTalker ? res.status(404).json({ message: 'Pessoa palestrante não encontrada'}) : res.status(200).json(idTalker);
+  if (!idTalker ) {
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada'})
+  }
+  return res.status(200).json(idTalker);
 }));
 
 app.post('/login', checkEmail, checkPassword, (_req, res) => {
@@ -55,7 +57,15 @@ app.post('/login', checkEmail, checkPassword, (_req, res) => {
   res.status(200).json({ token: `${token}` });
 });
 
-app.post('/talker', checkToken, checkName, checkAge, checkTalk, checkRate, checkWatchedAt, rescue(async (req, res) => {
+app.post(
+  '/talker',
+  checkToken,
+  checkName,
+  checkAge,
+  checkTalk,
+  checkRate,
+  checkWatchedAt,
+  rescue(async (req, res) => {
   const { name, age, talk: { watchedAt, rate } } = req.body;
   const talkerJson = await fs.readFile('talker.json');
   const talker = await JSON.parse(talkerJson);
@@ -70,7 +80,15 @@ app.post('/talker', checkToken, checkName, checkAge, checkTalk, checkRate, check
   res.status(201).json(talkers);
 }));
 
-app.put('/talker/:id', checkToken, checkName, checkAge, checkTalk, checkRate, checkWatchedAt, rescue(async (req, res) => {
+app.put(
+  '/talker/:id',
+  checkToken,
+  checkName,
+  checkAge,
+  checkTalk,
+  checkRate,
+  checkWatchedAt,
+  rescue(async (req, res) => {
   const { name, age, talk: { watchedAt, rate } } = req.body;
   const { id } = req.params;
   const talkerJson = await fs.readFile('talker.json');
