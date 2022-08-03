@@ -46,8 +46,8 @@ app.get('/talker/:id', rescue(async (req, res) => {
   const { id } = req.params;
   const talkers = await getFsTalker();
   const idTalker = talkers.find((talker) => talker.id === parseInt(id, 10));
-  if (!idTalker ) {
-    return res.status(404).json({ message: 'Pessoa palestrante não encontrada'})
+  if (!idTalker) {
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada'});
   }
   return res.status(200).json(idTalker);
 }));
@@ -77,7 +77,7 @@ app.post(
   };
   const newFileTalkers = [...talker, talkers];
   await setFsTalker(newFileTalkers);
-  res.status(201).json(talkers);
+  return res.status(201).json(talkers);
 }));
 
 app.put(
@@ -103,7 +103,7 @@ app.put(
   const newTalkers = [...talkerParse];
   newTalkers[talkerIndex] = newTalker;
   await setFsTalker(newTalkers);
-  res.status(200).json(newTalker);
+  return res.status(200).json(newTalker);
 }));
 
 app.delete('/talker/:id', checkToken, rescue(async (req, res) => {
@@ -112,7 +112,7 @@ app.delete('/talker/:id', checkToken, rescue(async (req, res) => {
   const talker = await JSON.parse(talkerJson);
   const talkerFilter = talker.filter((talk) => talk.id !== parseInt(id, 10));
   await setFsTalker(talkerFilter);
-  res.status(204).json({ message: 'Pessoa palestrante deletada com sucesso' });
+  return res.status(204).json({ message: 'Pessoa palestrante deletada com sucesso' });
 }));
 
 app.listen(PORT, () => {
