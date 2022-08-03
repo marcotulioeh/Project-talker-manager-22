@@ -66,22 +66,20 @@ app.post(
   checkRate,
   checkWatchedAt,
   rescue(async (req, res) => {
-  const { name, age, talk: { watchedAt, rate } } = req.body;
-  const talkerJson = await fs.readFile('talker.json');
-  const talker = await JSON.parse(talkerJson);
-  const talkers = {
-    id: talker.length + 1,
-    name,
-    age,
-    talk: {
-      watchedAt,
-      rate
-    },
-  };
-  const newFileTalkers = [...talker, talkers];
-  await setFsTalker(newFileTalkers);
-  return res.status(201).json(talkers);
-  }));
+    const { name, age, talk: { watchedAt, rate } } = req.body;
+    const talkerJson = await fs.readFile('talker.json');
+    const talker = await JSON.parse(talkerJson);
+    const talkers = {
+      id: talker.length + 1,
+      name,
+      age,
+      talk: { watchedAt, rate },
+    };
+    const newFileTalkers = [...talker, talkers];
+    await setFsTalker(newFileTalkers);
+    return res.status(201).json(talkers);
+    }),
+  );
 
 app.put(
   '/talker/:id',
@@ -92,25 +90,23 @@ app.put(
   checkRate,
   checkWatchedAt,
   rescue(async (req, res) => {
-  const { name, age, talk: { watchedAt, rate } } = req.body;
-  const { id } = req.params;
-  const talkerJson = await fs.readFile('talker.json');
-  const talkerParse = await JSON.parse(talkerJson);
-  const talkerIndex = talkerParse.findIndex((talker) => talker.id === parseInt(id, 10));
-  const newTalker = {
-    id: parseInt(id, 10),
-    name,
-    age,
-    talk: {
-      watchedAt,
-      rate
-    },
-  };
-  const newTalkers = [...talkerParse];
-  newTalkers[talkerIndex] = newTalker;
-  await setFsTalker(newTalkers);
-  return res.status(200).json(newTalker);
-}));
+    const { name, age, talk: { watchedAt, rate } } = req.body;
+    const { id } = req.params;
+    const talkerJson = await fs.readFile('talker.json');
+    const talkerParse = await JSON.parse(talkerJson);
+    const talkerIndex = talkerParse.findIndex((talker) => talker.id === parseInt(id, 10));
+    const newTalker = {
+      id: parseInt(id, 10),
+      name,
+      age,
+      talk: { watchedAt, rate },
+    };
+    const newTalkers = [...talkerParse];
+    newTalkers[talkerIndex] = newTalker;
+    await setFsTalker(newTalkers);
+    return res.status(200).json(newTalker);
+  }),
+);
 
 app.delete('/talker/:id', checkToken, rescue(async (req, res) => {
   const { id } = req.params;
