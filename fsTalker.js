@@ -7,4 +7,6 @@ const getFsTalker = () => {
   return talker;
 };
 
-module.exports = { getFsTalker };
+const setFsTalker = (talkers) => fs.writeFile('talker.json', JSON.stringify(talkers));
+
+module.exports = { getFsTalker, setFsTalker };
