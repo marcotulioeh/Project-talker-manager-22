@@ -47,7 +47,7 @@ app.get('/talker/:id', rescue(async (req, res) => {
   const talkers = await getFsTalker();
   const idTalker = talkers.find((talker) => talker.id === parseInt(id, 10));
   if (!idTalker) {
-    return res.status(404).json({ message: 'Pessoa palestrante não encontrada'});
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
   return res.status(200).json(idTalker);
 }));
@@ -73,12 +73,15 @@ app.post(
     id: talker.length + 1,
     name,
     age,
-    talk: { watchedAt, rate },
+    talk: {
+      watchedAt,
+      rate
+    },
   };
   const newFileTalkers = [...talker, talkers];
   await setFsTalker(newFileTalkers);
   return res.status(201).json(talkers);
-}));
+  }));
 
 app.put(
   '/talker/:id',
@@ -98,7 +101,10 @@ app.put(
     id: parseInt(id, 10),
     name,
     age,
-    talk: { watchedAt, rate },
+    talk: {
+      watchedAt,
+      rate
+    },
   };
   const newTalkers = [...talkerParse];
   newTalkers[talkerIndex] = newTalker;
