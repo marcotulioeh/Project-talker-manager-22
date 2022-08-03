@@ -1,11 +1,18 @@
 const express = require('express');
+const fs = require('fs').promises;
 const bodyParser = require('body-parser');
 const rescue = require('express-rescue');
-const { getFsTalker } = require('./fsTalker');
+const { getFsTalker, setFsTalker } = require('./fsTalker');
 const crypto = require('crypto');
 const {
   checkEmail,
   checkPassword,
+  checkToken,
+  checkName,
+  checkAge,
+  checkTalk,
+  checkWatchedAt,
+  checkRate,
 } = require('./tokenValidation');
 
 const app = express();
@@ -35,6 +42,21 @@ app.post('/login', checkEmail, checkPassword, (_req, res) => {
   const token = crypto.randomBytes(8).toString('hex');
   res.status(200).json({ token: `${token}` });
 });
+
+app.post('/talker', checkToken, checkName, checkAge, checkTalk, checkRate, checkWatchedAt, rescue(async (req, res) => {
+  const { name, age, talk: { watchedAt, rate } } = req.body;
+  const talkerJson = await fs.readFile('talker.json');
+  const talker = await JSON.parse(talkerJson);
+  const talkers = {
+    id: talker.length + 1,
+    name,
+    age,
+    talk: { watchedAt, rate },
+  };
+  const newFileTalkers = [...talker, talkers];
+  await setFsTalker(newFileTalkers);
+  res.status(201).json(talkers);
+}));
 
 app.listen(PORT, () => {
   console.log('Online');
